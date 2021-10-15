@@ -1,0 +1,101 @@
+﻿<Window x:Class="BitcoinPriceViewer.View.CoinPricesMainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewmodel="clr-namespace:BitcoinPriceViewer.ViewModel"
+        xmlns:view="clr-namespace:BitcoinPriceViewer.View"
+        xmlns:model="clr-namespace:BitcoinPriceViewer.Model"
+        mc:Ignorable="d"
+        Title="BitcoinPriceViewer" Height="500" Width="800" >
+    <Window.Resources>
+        <Style x:Key="GridHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="SteelBlue"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Height" Value="40" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="GridElementStyle"  TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="DarkBlue"/>
+        </Style>
+        <SolidColorBrush x:Key="VerticalGridLine" Color="FloralWhite" />
+        <SolidColorBrush x:Key="HorizontalGridLine" Color="FloralWhite"/>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="25" />
+            <RowDefinition Height="0.5*" />
+            <RowDefinition Height="5*" />
+            <RowDefinition Height="0.5*" />
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" Margin="20,8,0,0" FontSize="16" Foreground="Teal" FontWeight="DemiBold" Padding="0" 
+               Content="Choose start and end date to calculate the average price" />
+        <Label x:Name="MessageLabel" Grid.Row="1" Margin="20,0,0,0" Foreground="Red" Content="{Binding Path=Message}" />
+        
+        <DockPanel Grid.Row="2" Margin=" 20,0,0,0">
+            <Label x:Name="StartDateLabel" FontSize="13" FontWeight="SemiBold" Margin="0,5,0,0" Height="30" Content="Start Date:"/>
+
+            <DatePicker x:Name="StartDatePicker" Margin="0,5,10,0" Height="30" >
+                <DatePicker.SelectedDate>
+                    <Binding Path="SelectedStartDate" NotifyOnValidationError="True">
+                        <Binding.ValidationRules>
+                            <model:EndDateValidationRule/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </DatePicker.SelectedDate>
+            </DatePicker>
+
+            <Label x:Name="EndDateLabel" FontWeight="SemiBold" FontSize="13" Margin="0,5,0,0" Height="30" Content="End Date:" />
+            
+            <DatePicker x:Name="EndDatePicker" Margin="0,5,10,0" Height="30" >
+                <DatePicker.SelectedDate>
+                    <Binding Path="SelectedEndDate">
+                        <Binding.ValidationRules>
+                            <model:EndDateValidationRule/>
+                        </Binding.ValidationRules>
+                    </Binding>
+                </DatePicker.SelectedDate>
+            </DatePicker>
+
+            <Label x:Name="AvgPriceLabel" FontWeight="SemiBold" Margin="0,5,0,0" FontSize="13" Height="30" Content="Average Price:" />
+            <TextBox x:Name="AvgPriceTextBox" Margin="0,5,10,0" Height="30" Width="100"
+                     TextAlignment= "Center" VerticalContentAlignment="Center" Text="{Binding AveragePrice}"/>
+            <Button x:Name="CalculateButton" Margin="0,5,10,0" Height="30" Width="100" Click="CalculateButton_Click"
+                    Content="Calculate" FontWeight="Heavy"/>
+            <Button x:Name="UpdateButton" HorizontalAlignment="Right"  Margin="0,5,20,0" Height="30" Width="100" Grid.Column="3" Click="UpdateButton_Click"
+                    Content="Update Prices" FontWeight="Heavy"/>
+        </DockPanel>
+        <DataGrid x:Name="MainGrid" Grid.Row="3" HorizontalAlignment="Stretch" Margin="0,10,0,0"
+                  VerticalAlignment="Stretch" ColumnWidth="*" AutoGenerateColumns="False"
+                  VerticalGridLinesBrush="{StaticResource VerticalGridLine}" 
+                  HorizontalGridLinesBrush="{StaticResource HorizontalGridLine}" 
+                  ItemsSource="{Binding Path=CoinValues}" 
+                  LoadingRow="MainGrid_LoadingRow">
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="LightGray"/>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Key}" Header="Date" MinWidth="100"
+                                    IsReadOnly="True" HeaderStyle="{StaticResource GridHeaderStyle}"
+                                    ElementStyle="{StaticResource GridElementStyle}" >
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Value}" Header="Closing Price [BTC/USD]" MinWidth="150" 
+                                    IsReadOnly="True" HeaderStyle="{StaticResource GridHeaderStyle}"
+                                    ElementStyle="{StaticResource GridElementStyle}" >
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="20,10,0,0">
+            <Label x:Name="StatusHeaderLabel" Grid.Row="2" Content="Last Updated On:" />
+            <Label x:Name="StatusValueLabel" Grid.Row="2" Content="{Binding StatusUpdate}" />
+            <Label x:Name="ViewUpdateStatusLabel" Grid.Row="2" Content="{Binding ViewUpdateStatus}" />
+        </StackPanel>
+    </Grid>
+</Window>
